@@ -24,5 +24,6 @@ in {
     foot
     wezterm
     atuin
+    zellij
   ];
 }

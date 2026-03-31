@@ -1,4 +1,3 @@
-
 ;; (defcfg
   ;; 1. 处理未定义的按键（你现在用的）
 ;;  process-unmapped-keys yes
@@ -68,4 +67,3 @@
   lsft z    x    c    v    b    0    1    2    3    /    rsft
   lctl lmet lalt           spc            ralt rmet rctl
 )
-

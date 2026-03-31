@@ -9,7 +9,8 @@
 }: {
   imports = [
     # Include the results of the hardware scan.
-    ./hardware-configuration.nix
+    # ./hardware-configuration.nix
+    # ./wsl.nix
     # ./btrfs-subvolumes.nix
     # "${builtins.fetchTarball "https://github.com/nix-community/disko/archive/master.tar.gz"}/module.nix"
   ];
@@ -23,12 +24,12 @@
   };
 
   # Use the GRUB 2 boot loader.
-  boot.loader.grub = {
-    enable = true;
-    efiSupport = true;
-    efiInstallAsRemovable = true;
-    device = "nodev"; # or "nodev" for efi only
-  };
+  #  boot.loader.grub = {
+  #    enable = true;
+  #    efiSupport = true;
+  #    efiInstallAsRemovable = true;
+  #    device = "nodev"; # or "nodev" for efi only
+  #  };
   boot.kernelParams = [
     # 正确的 SOF 强制开关
     "snd_intel_dspcfg.dsp_driver=3" # 尝试强制使用 SOF
@@ -110,34 +111,34 @@
   };
   # Enable sound.
   services = {
-    snapper = {
-      configs = {
-        root = {
-          SUBVOLUME = "/";
-          # 权限设置：注意现在是直接作为属性，且值是字符串
-          ALLOW_USERS = ["zjw"];
-          # 策略设置：现在直接写在配置块里，通常建议全大写以匹配 snapper 原生参数名
-          TIMELINE_CREATE = true;
-          TIMELINE_CLEANUP = true;
-          TIMELINE_LIMIT_HOURLY = "24";
-          TIMELINE_LIMIT_DAILY = "7";
-          TIMELINE_LIMIT_WEEKLY = "0";
-          TIMELINE_LIMIT_MONTHLY = "0";
-          TIMELINE_LIMIT_YEARLY = "0";
-        };
-        home = {
-          SUBVOLUME = "/home";
-          ALLOW_USERS = ["zjw"];
-          TIMELINE_CREATE = true;
-          TIMELINE_CLEANUP = true;
-          TIMELINE_LIMIT_HOURLY = "24";
-          TIMELINE_LIMIT_DAILY = "7";
-          TIMELINE_LIMIT_WEEKLY = "0";
-          TIMELINE_LIMIT_MONTHLY = "0";
-          TIMELINE_LIMIT_YEARLY = "0";
-        };
-      };
-    };
+    #    snapper = {
+    #      configs = {
+    #        root = {
+    #          SUBVOLUME = "/";
+    #          # 权限设置：注意现在是直接作为属性，且值是字符串
+    #          ALLOW_USERS = ["zjw"];
+    #          # 策略设置：现在直接写在配置块里，通常建议全大写以匹配 snapper 原生参数名
+    #          TIMELINE_CREATE = true;
+    #          TIMELINE_CLEANUP = true;
+    #          TIMELINE_LIMIT_HOURLY = "24";
+    #          TIMELINE_LIMIT_DAILY = "7";
+    #          TIMELINE_LIMIT_WEEKLY = "0";
+    #          TIMELINE_LIMIT_MONTHLY = "0";
+    #          TIMELINE_LIMIT_YEARLY = "0";
+    #        };
+    #        home = {
+    #          SUBVOLUME = "/home";
+    #          ALLOW_USERS = ["zjw"];
+    #          TIMELINE_CREATE = true;
+    #          TIMELINE_CLEANUP = true;
+    #          TIMELINE_LIMIT_HOURLY = "24";
+    #          TIMELINE_LIMIT_DAILY = "7";
+    #          TIMELINE_LIMIT_WEEKLY = "0";
+    #          TIMELINE_LIMIT_MONTHLY = "0";
+    #          TIMELINE_LIMIT_YEARLY = "0";
+    #        };
+    #      };
+    #    };
     flatpak.enable = true;
     udisks2.enable = true;
     dbus.packages = [pkgs.fcitx5];
@@ -181,18 +182,15 @@
     #     # CPU_BOOST_ON_BAT = 0;
     #   };
     # };
-    kanata = {
-      enable = true;
-      keyboards = {
-        default = {
-          config = builtins.readFile ../kanata/config.kbd;
-          extraDefCfg = "process-unmapped-keys yes";
-        };
-      };
-    };
-    udev.extraRules = ''
-      KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="342d", ATTRS{idProduct}=="e491", MODE="0666", TAG+="uaccess"
-    '';
+    #    kanata = {
+    #      enable = true;
+    #      keyboards = {
+    #        default = {
+    #          config = builtins.readFile ../kanata/config.kbd;
+    #          extraDefCfg = "process-unmapped-keys yes";
+    #        };
+    #      };
+    #    };
   };
 
   programs = {
@@ -212,6 +210,8 @@
         expat
         # 如果 rust-analyzer 报错，通常需要这个
         libgcc
+
+        librime
       ];
     };
   };
@@ -220,19 +220,6 @@
   # services.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.zjw = {
-    isNormalUser = true;
-    extraGroups = ["wheel" "input" "video" "podman" "audio"]; # Enable ‘sudo’ for the user.
-    packages = with pkgs; [
-    ];
-  };
-  virtualisation.podman = {
-    enable = true;
-    # 这一行非常关键：它会创建一个符号链接，让所有调用 docker 命令的操作自动转向 podman
-    dockerCompat = true;
-    # 允许容器通过主机名互相访问
-    defaultNetwork.settings.dns_enabled = true;
-  };
   # programs.firefox.enable = true;
   security.polkit.enable = true;
   security.rtkit.enable = true;
@@ -254,15 +241,14 @@
     btop
     duf
     dust
-    ripgrep
     fd
+    ripgrep
     bat
+    just
     yazi
     nushell
     jujutsu
     _7zz
-    nh
-    just
 
     alsa-utils
     pavucontrol
@@ -273,11 +259,17 @@
     btrfs-assistant
     polkit_gnome
 
-    nerd-fonts.iosevka-term
     stdenv.cc
     brightnessctl
     alejandra
   ];
+
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 50; # 在 15Gi 基础上分 7.5Gi，或在 24Gi 基础上分 12Gi
+    priority = 100;
+  };
 
   fonts.packages = with pkgs; [
     nerd-fonts.iosevka-term
@@ -298,13 +290,9 @@
     enable = true;
     defaultFonts = {
       # 在所有分类中，手动将 SC (Simplified Chinese) 放在最前面
-      # sansSerif = ["Noto Sans CJK SC"];
+      sansSerif = ["Sarasa UI SC" "Noto Sans CJK SC"];
       serif = ["Noto Serif CJK SC"];
-      # monospace = ["Noto Sans Mono CJK SC"];
-# 界面用 UI 版
-    sansSerif = ["Sarasa UI SC" "Noto Sans CJK SC"];
-    # 写代码用 Mono 或 Mono Slab
-    monospace = ["Sarasa Mono SC" "Noto Sans Mono CJK SC"];
+      monospace = ["Sarasa Mono SC" "Noto Sans Mono CJK SC"];
     };
   };
   environment.variables = {

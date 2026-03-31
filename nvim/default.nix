@@ -12,6 +12,9 @@ in {
     # Rust
     rust-analyzer
 
+    pyright
+    python313Packages.debugpy
+
     # Typst (tinymist)
     tinymist
     typst

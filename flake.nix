@@ -4,6 +4,7 @@
   inputs = {
     # NixOS 官方软件源，这里使用 nixos-25.11 分支
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
+    nixos-wsl.url = "github:nix-community/NixOS-WSL/main";
     rime-config = {
       url = "github:luckyydoge/rime";
       flake = false;
@@ -38,18 +39,22 @@
     disko,
     home-manager,
     zen-browser,
+    nixos-wsl,
     # noctalia-shell,
     ...
   } @ inputs: {
     nixosConfigurations = {
       zjw-nixos = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
         specialArgs = {inherit inputs;};
         modules = [
           # 这里导入之前我们使用的 configuration.nix，
           # 这样旧的配置文件仍然能生效
-          ./system/configuration.nix
+          ./system/configuration-base.nix
+          ./system/xingyao14/configuration.nix
           ./noctalia.nix
-          disko.nixosModules.disko
+
+          # disko.nixosModules.disko
           home-manager.nixosModules.home-manager
           {
             # nixpkgs.config.allowUnfreePredicate = pkg:
@@ -76,6 +81,44 @@
           }
         ];
       };
+
+      zjw-wsl = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs;};
+        modules = [
+          # 这里导入之前我们使用的 configuration.nix，
+          # 这样旧的配置文件仍然能生效
+          ./system/configuration-base.nix
+          ./system/wsl.nix
+          ./noctalia.nix
+          nixos-wsl.nixosModules.default
+          # disko.nixosModules.disko
+          home-manager.nixosModules.home-manager
+          {
+            # nixpkgs.config.allowUnfreePredicate = pkg:
+            #   builtins.elem (lib.getName pkg) [
+            #     "idea"
+            #   ];
+            nixpkgs.config.allowUnfree = true;
+          }
+
+          # noctalia-shell.homeModules.default
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+
+            # 这里的 ryan 也得替换成你的用户名
+            # 这里的 import 函数在前面 Nix 语法中介绍过了，不再赘述
+            home-manager.users.zjw =
+              import
+              ./home.nix;
+
+            # 使用 home-manager.extraSpecialArgs 自定义传递给 ./home.nix 的参数
+            # 取消注释下面这一行，就可以在 home.nix 中使用 flake 的所有 inputs 参数了
+            home-manager.extraSpecialArgs = {inherit inputs;};
+          }
+        ];
+      };
+
       installer = nixpkgs.lib.nixosSystem {
         # system = "x86_64-linux"; # 或者是你的目标平台
         specialArgs = {inherit inputs;};

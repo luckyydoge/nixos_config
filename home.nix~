@@ -12,7 +12,6 @@ in {
     ./rime
     ./nvim
     ./develop
-    ./emacs
   ];
   # 注意修改这里的用户名与用户目录
   home.username = "zjw";
@@ -25,14 +24,10 @@ in {
     zathura
     zathuraPkgs.zathura_pdf_mupdf
     onlyoffice-desktopeditors
-
     wl-clipboard
+    sarasa-gothic
     gnumake
     librime
-
-    google-chrome
-
-    tree-sitter-grammars.tree-sitter-nix
 
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
@@ -44,24 +39,8 @@ in {
         enable = true;
       };
     };
-    emacs = {
-      enable = true;
-      package = pkgs.emacs-pgtk;
-      extraPackages = epkgs:
-        with epkgs; [
-          # 使用 override 强行注入 librime，Nix 会自动处理编译环境
-          (rime.override {librime = pkgs.librime;})
-          nix-ts-mode
-          envrc
-        ];
-    };
   };
 
-  services = {
-    emacs = {
-      enable = true;
-    };
-  };
   # git 相关配置
   programs.git = {
     enable = true;
