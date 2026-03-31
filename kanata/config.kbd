@@ -1,0 +1,71 @@
+
+;; (defcfg
+  ;; 1. 处理未定义的按键（你现在用的）
+;;  process-unmapped-keys yes
+;; )
+;; 1. 定义物理键位 (物理位置参考)
+(defsrc
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  q    w    e    r    t    y    u    i    o    p    [    ]    \
+  caps a    s    d    f    g    h    j    k    l    ;    '    ret
+  lsft z    x    c    v    b    n    m    ,    .    /    rsft
+  lctl lmet lalt           spc            ralt rmet rctl
+)
+
+
+;; 2. 定义别名
+(defalias
+  ;; tap-hold: 短按 esc, 长按切换到名为 'nav' 的层
+  cap (tap-hold 150 150 esc (layer-toggle nav))
+
+  ;; Semicolon: 短按分号, 长按进入 mose 鼠标层
+  ms (tap-hold 150 150 spc (layer-toggle mose))
+
+  ;; Tab: 短按 Tab, 长按进入数字符号层 (num-sym)
+  tab-ns  (tap-hold 150 150 tab (layer-toggle num-sym))
+
+  ;; --- 鼠标功能别名 ---
+  ;; 移动 (速度可调，1 1 是基础速度)
+  msu (movemouse-accel-up 10 200 1 10)
+  msd (movemouse-accel-down 10 200 1 10)
+  msl (movemouse-accel-left 10 200 1 10)
+  msr (movemouse-accel-right 10 200 1 10)
+
+  mwu (mwheel-up 1 1)
+  mwd (mwheel-down 1 1)
+)
+
+;; 3. 默认层 (主层)
+(deflayer default
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  @tab-ns q w    e    r    t    y    u    i    o    p    [    ]    \
+  @cap a    s    d    f    g    h    j    k    l    ;    '    ret
+  lsft z    x    c    v    b    n    m    ,    .    /    rsft
+  lctl lmet lalt           @ms            ralt rmet rctl
+)
+
+;; 4. 导航层 (当你长按 Caps 时激活)
+(deflayer nav
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  q    w    e    r    t    y   pgdn pgup home end   [    ]    \
+  _    a    s    d    ret  g  left  down  up right enter '   ret
+  lsft z    x    c    v    b  ins   bspc  del  .    /    rsft
+  lctl lmet lalt           bspc           ralt rmet rctl
+)
+
+(deflayer mose
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  tab  S-1 S-2   [    ]   S-5  S-,   7    8    9    -    /   S-6  \
+  _    S-7 S-;  S-9   =   S-0  S-.   4    5    6    +   S-8    ret
+  lsft S-- S-\  S-[  S-]  S-4   0    1    2    3    .    rsft
+  lctl lmet lalt            _             ralt rmet rctl
+)
+
+(deflayer num-sym
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  _    q    w    e    r    t    y    7    8    9    p    [    ]    \
+  _    a    s    d    f    g    h    4    5    6    ;    '    ret
+  lsft z    x    c    v    b    0    1    2    3    /    rsft
+  lctl lmet lalt           spc            ralt rmet rctl
+)
+
