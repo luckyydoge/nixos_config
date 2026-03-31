@@ -83,6 +83,7 @@
       };
 
       zjw-wsl = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
         specialArgs = {inherit inputs;};
         modules = [
           # 这里导入之前我们使用的 configuration.nix，

@@ -10,6 +10,9 @@ switch-legacy:
 switch:
 	sudo nixos-rebuild switch --flake .#zjw-nixos
 
+wsl:
+	sudo nixos-rebuild switch --flake .#zjw-wsl
+
 # 安装系统 (示例参数化)
 install host="zjw-nixos":
     sudo nixos-install --flake .#{{host}} --option substituters https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store --verbose --show-trace
