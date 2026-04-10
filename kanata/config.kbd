@@ -23,6 +23,9 @@
   ;; Tab: 短按 Tab, 长按进入数字符号层 (num-sym)
   tab-ns  (tap-hold 150 150 tab (layer-toggle num-sym))
 
+  to-colemak-dh (layer-switch colemak-dh)
+  to-default (layer-switch default)
+
   ;; --- 鼠标功能别名 ---
   ;; 移动 (速度可调，1 1 是基础速度)
   msu (movemouse-accel-up 10 200 1 10)
@@ -40,7 +43,15 @@
   @tab-ns q w    e    r    t    y    u    i    o    p    [    ]    \
   @cap a    s    d    f    g    h    j    k    l    ;    '    ret
   lsft z    x    c    v    b    n    m    ,    .    /    rsft
-  lctl lmet lalt           @ms            ralt rmet rctl
+  lctl lmet lalt           @ms            @to-colemak-dh rmet rctl
+)
+
+(deflayer colemak-dh
+  grv  1    2    3    4    5    6    7    8    9    0    -    =    bspc
+  @tab-ns q    w    f    p    b    j    l    u    y    ;    [    ]    \
+  @cap  a    r    s    t    g    m    n    e    i    o    '    ret
+  lsft  z    x    c    d    v    k    h    ,    .    /    rsft
+  lctl  lmet lalt          @ms            @to-default rmet rctl
 )
 
 ;; 4. 导航层 (当你长按 Caps 时激活)
