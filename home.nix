@@ -35,6 +35,8 @@ in {
     tree-sitter-grammars.tree-sitter-nix
 
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+    bun
+    nodejs
   ];
 
   programs = {
@@ -53,6 +55,10 @@ in {
           (rime.override {librime = pkgs.librime;})
           nix-ts-mode
           envrc
+          org-roam
+          org-roam-ui
+          sqlite3
+	  xwidgete
         ];
     };
   };
