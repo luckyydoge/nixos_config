@@ -37,6 +37,7 @@ in {
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
     bun
     nodejs
+    jjui
   ];
 
   programs = {
